@@ -45,7 +45,14 @@ def messageInfo(app):
 
 
 def decompressFile(app):
-    content = inversedDictionnary = padded_text = ""
+    bytes_array = inversedDictionnary = padded_text = ""
+    
+    # Récupérer le bytes array
+    while True:
+        resultB = app.recv(1).decode('latin-1')
+        if (resultB == '²'):
+            break
+        bytes_array += resultB
 
     # Récupérer le dictionnaire
     while True:
@@ -53,8 +60,8 @@ def decompressFile(app):
         if (resultD == '²'):
             break
         inversedDictionnary += resultD
-    
-    # Récupérer le padded text
+
+    # Récupérer le padded_text
     while True:
         resultP = app.recv(1).decode('latin-1')
         if (resultP == '²'):
@@ -63,8 +70,12 @@ def decompressFile(app):
     
     # Convertir dictionnary en dict
     inversedDictionnary = ast.literal_eval(inversedDictionnary)
+
+    # Convertir Content en bytes
+    bytes_array = bytes_array.lstrip("b").strip("'\"")
+    bytes_array = bytes_array.encode("utf-8")
     
-    actual_text = Decompression(inversedDictionnary).decompress(padded_text)
+    actual_text = Decompression(inversedDictionnary).decompress(bytes_array, padded_text)
 
     return actual_text
 

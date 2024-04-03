@@ -25,15 +25,28 @@ class Decompression:
                 decoded_text += self.__dictionnaire_inversé[current_bit]  
                 current_bit = ''   
         return decoded_text
+    
+    def __build_padded_text_from_byte_array(self, bytes_array):
+        binary_text = ''.join(format(byte, '08b') for byte in bytes_array)
+        padding_bits = int(binary_text[:8], 2)
+        compressed_text = binary_text[8:-padding_bits]
+        padded_text = "{:08b}".format(padding_bits) + compressed_text
+        return padded_text
 
-    def decompress(self, padded_text):
+    def decompress(self, bytes_array, padded_text_original):
 
-
-        text_after_removing_padding = self.__Remove_Padding(padded_text)
-        actual_text = self.__Decoded_Text(text_after_removing_padding)
+        padded_text_extrait = self.__build_padded_text_from_byte_array(bytes_array)
+        # text_after_removing_padding = self.__Remove_Padding(padded_text)
+        # actual_text = self.__Decoded_Text(text_after_removing_padding)
         
-        # print("Dictionnaire inversé: ", self.__dictionnaire_inversé)
-        # print("Compressed bytes: ", compressed_content)
-        # print("Padded text: ", padded_text)
+        print("Dictionnaire inversé: ", self.__dictionnaire_inversé)
+        print("Compressed bytes: ", bytes_array)
 
+        if padded_text_original == padded_text_extrait:
+            print(True)
+        else:
+            print(False)
+
+        return "test"
+        
         return actual_text

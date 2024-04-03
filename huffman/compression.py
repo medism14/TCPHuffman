@@ -90,9 +90,9 @@ class Compression:
             self.__build_tree_code()
             encoded_text = self.__build_encoded_text(text)
             padded_text = self.__build_padded_text(encoded_text)
-            # bytes_array = self.__build_byte_array(padded_text)
+            bytes_array = self.__build_byte_array(padded_text)
         inverse_dictionary = self.__dictionnaire_inversé
-        return inverse_dictionary, padded_text
+        return bytes(bytes_array), inverse_dictionary, padded_text
 
 
 # Exemple d'utilisation :
