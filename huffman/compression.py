@@ -16,7 +16,6 @@ class Compression:
         self.path = path
         self.__heap = []
         self.__code = {}
-        self.__dictionnaire_inversé = {}
     
     def __lt__(self, other):
         return self.occurrence < other.occurrence
@@ -50,7 +49,6 @@ class Compression:
             return
         if root.caractere is not None:
             self.__code[root.caractere] = curr_bit
-            self.__dictionnaire_inversé[curr_bit] = root.caractere
             return
         self.__build_tree_code_helper(root.left, curr_bit+'0')
         self.__build_tree_code_helper(root.right, curr_bit+'1')
@@ -64,15 +62,8 @@ class Compression:
         for char in text:
             encoded_text += self.__code[char]
         return encoded_text
-    
-    def __build_byte_array(self, padded_text):
-        array = []
-        for i in range(0, len(padded_text), 8):
-            byte = padded_text[i:i+8]
-            array.append(int(byte, 2))
-        return array
             
-    def __build_padded_text(self , encoded_text):
+    def __build_padded_text(self, encoded_text):
         padding_caractere = 8 - len(encoded_text) % 8
         for i in range(padding_caractere):
             encoded_text += '0'       
@@ -90,9 +81,8 @@ class Compression:
             self.__build_tree_code()
             encoded_text = self.__build_encoded_text(text)
             padded_text = self.__build_padded_text(encoded_text)
-            bytes_array = self.__build_byte_array(padded_text)
-        inverse_dictionary = self.__dictionnaire_inversé
-        return bytes(bytes_array), inverse_dictionary, padded_text
+        dictionnary = self.__code
+        return dictionnary, padded_text
 
 
 # Exemple d'utilisation :

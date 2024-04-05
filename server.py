@@ -57,10 +57,9 @@ class ThreadLaunch(threading.Thread):
                 urlDowFile = f"C:/Users/Etudiant/Desktop/Personnel/Université/M1/S2/Programmation parallèle/projet/files/{file}"
 
                 ## Compresser le fichier et l'envoyer à l'utilisateur
-                bytes_array, inversedDictionnary, padded_text = Compression(urlDowFile).compress()
+                dictionnary, padded_text = Compression(urlDowFile).compress()
 
-                self.info.send(f"{bytes_array}²".encode('latin-1'))
-                self.info.send(f"{inversedDictionnary}²".encode('latin-1'))
+                self.info.send(f"{dictionnary}²".encode('latin-1'))
                 self.info.send(f"{padded_text}²".encode('latin-1'))
 
             elif action == "2":
