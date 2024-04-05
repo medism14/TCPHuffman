@@ -21,6 +21,7 @@ fApi.add_middleware(
     allow_headers=["*"],
 )
 
+
 def messageInfo(app):
     type = taille = ""
     #Type

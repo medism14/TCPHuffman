@@ -67,13 +67,28 @@
         bodyTable.addEventListener('click', async (event) => {
             let item = event.target;
             if (parentDownloadClass(item)) { 
-                let fileName = parentDownloadClass(item);
-
-                let response = await axios.post(`http://127.0.0.1:8000/download-file?file=${fileName}`);
-
-                let data = await response.data;
-
-                console.log(data);
+                
+                try {
+                    let fileName = parentDownloadClass(item);
+    
+                    let response = await axios.post(`http://127.0.0.1:8000/download-file?file=${fileName}`);
+    
+                    let text = await response.data;
+    
+                    let blob = new Blob([text], { type: 'text/plain'} );
+                    let url = URL.createObjectURL(blob);
+                    let link = document.createElement('a');
+    
+                    link.href = url;
+                    link.download = fileName;
+    
+                    link.click();
+    
+                    URL.revokeObjectURL(url)
+                } catch (error) {
+                    alert("Erreur lors du téléchargemnet du fichier")
+                }
+                
             }
         });
     </script>

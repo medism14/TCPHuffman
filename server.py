@@ -1,7 +1,6 @@
 import socket
 import threading
 import os
-import json
 
 from huffman.compression import Compression
 
@@ -14,18 +13,18 @@ app.listen()
 class ThreadLaunch(threading.Thread): 
     def __init__(self, info):
         super().__init__()
-        self.info = info
+        self.conn = conn
 
     def EventFiles(self, file):
         fileEncoded = file.encode()
         tailleMsg = len(fileEncoded)
-        self.info.send(f'txt|{tailleMsg}|'.encode())
-        self.info.send(fileEncoded)
+        self.conn.send(f'txt|{tailleMsg}|'.encode())
+        self.conn.send(fileEncoded)
 
     def recupLink(self):
         file = taille = ""
         while True:
-            result = self.info.recv(1).decode()
+            result = self.conn.recv(1).decode()
 
             if (result == '|'):
                 break
@@ -33,13 +32,12 @@ class ThreadLaunch(threading.Thread):
             taille += result
             
         taille = int(taille)
-        file = self.info.recv(taille).decode()
+        file = self.conn.recv(taille).decode()
         return file
     
     def run(self):
-        
         while True:
-            action = self.info.recv(1).decode()
+            action = self.conn.recv(1).decode()
 
             if action == "0":
                 ##Recuperer les fichiers
@@ -49,7 +47,7 @@ class ThreadLaunch(threading.Thread):
                     for file in files:
                         self.EventFiles(file)
 
-                self.info.send(f'fini|0|'.encode())
+                self.conn.send(f'fini|0|'.encode())
 
             elif action == "1":
                 ## Télécharger un fichier
@@ -59,14 +57,14 @@ class ThreadLaunch(threading.Thread):
                 ## Compresser le fichier et l'envoyer à l'utilisateur
                 dictionnary, padded_text = Compression(urlDowFile).compress()
 
-                self.info.send(f"{dictionnary}²".encode('latin-1'))
-                self.info.send(f"{padded_text}²".encode('latin-1'))
+                self.conn.send(f"{dictionnary}²".encode('latin-1'))
+                self.conn.send(f"{padded_text}²".encode('latin-1'))
 
             elif action == "2":
                 ##Déconnexion
-                self.info.close()
+                self.conn.close()
                 break
 
 while True:
-    info, _ = app.accept()
-    ThreadLaunch(info).start()  
+    conn, _ = app.accept()
+    ThreadLaunch(conn).start()  
