@@ -50,11 +50,11 @@ class ThreadLaunch(threading.Thread):
                 self.conn.send(f'fini|0|'.encode())
 
             elif action == "1":
-                ## Télécharger un fichier
+                ##Télécharger un fichier
                 file = self.recupLink()
                 urlDowFile = f"C:/Users/Etudiant/Desktop/Personnel/Université/M1/S2/Programmation parallèle/projet/files/{file}"
 
-                ## Compresser le fichier et l'envoyer à l'utilisateur
+                ##Compresser le fichier et l'envoyer à l'utilisateur
                 dictionnary, padded_text = Compression(urlDowFile).compress()
 
                 self.conn.send(f"{dictionnary}²".encode('latin-1'))

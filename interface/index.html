@@ -29,9 +29,11 @@
     </div>
 
     <script>
-        const bodyTable = document.getElementById('bodyTable');
+        //Récuperer les fichiers
 
+        const bodyTable = document.getElementById('bodyTable');
         const fetchFiles = async () => {
+
             const response = await axios.get(`http://127.0.0.1:8000/recup-files`);
 
             const data = await response.data;
@@ -47,6 +49,8 @@
         }
 
         fetchFiles()
+
+        //Télécharger le fichier
 
         const parentDownloadClass = (element) => {
             let currentElement = element;
@@ -72,18 +76,18 @@
                     let fileName = parentDownloadClass(item);
     
                     let response = await axios.post(`http://127.0.0.1:8000/download-file?file=${fileName}`);
-    
+                    
                     let text = await response.data;
-    
+                
                     let blob = new Blob([text], { type: 'text/plain'} );
                     let url = URL.createObjectURL(blob);
                     let link = document.createElement('a');
-    
+                
                     link.href = url;
                     link.download = fileName;
-    
+                
                     link.click();
-    
+                
                     URL.revokeObjectURL(url)
                 } catch (error) {
                     alert("Erreur lors du téléchargemnet du fichier")

@@ -93,7 +93,7 @@ def getFiles():
         if type == "fini":
             break
         
-        listFiles.append(app.recv(taille).decode()) 
+        listFiles.append(app.recv(taille).decode())
     
     app.send("2".encode())
 
