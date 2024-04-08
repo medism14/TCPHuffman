@@ -1,4 +1,4 @@
-import heapq
+import heapq # pour manipuler le tas
 
 class BinaryTree:
     
@@ -30,8 +30,8 @@ class Compression:
         
     def __build_heap(self, frequency_dict):
         for key in frequency_dict:
-            frequency = frequency_dict[key]
-            binary_tree_node = BinaryTree(key, frequency)
+            frequency = frequency_dict[key]  #Récupère la fréquence associée au caractère
+            binary_tree_node = BinaryTree(key, frequency)  #Crée un nouvel objet BinaryTree (nœud de l'arbre binaire) avec le caractère key et sa fréquence associée frequency.
             heapq.heappush(self.__heap, binary_tree_node)
     
     def __build_binary_tree(self):
@@ -44,27 +44,27 @@ class Compression:
             new_node.right = binary_tree_node_2
             heapq.heappush(self.__heap, new_node)
         
-    def __build_tree_code_helper(self, root, curr_bit):
-        if root is None:
+    def __build_tree_code_helper(self, root, curr_bit): #root, qui est le nœud actuellement examiné dans l'arbre, et curr_bit, qui est le code binaire actuel en cours de construction
+        if root is None:                                  #Vérifie si le noeud actuel (root) est nul.
             return
-        if root.caractere is not None:
-            self.__code[root.caractere] = curr_bit
+        if root.caractere is not None:                    # donc c'est une feille 
+            self.__code[root.caractere] = curr_bit         #associons le code curr_bit à ce caractère dans le dictionnaire self.__code
             return
-        self.__build_tree_code_helper(root.left, curr_bit+'0')
+        self.__build_tree_code_helper(root.left, curr_bit+'0')  #continuons à explorer récursivement les branches gauche et droite 
         self.__build_tree_code_helper(root.right, curr_bit+'1')
         
     def __build_tree_code(self):
-        root = heapq.heappop(self.__heap)
-        self.__build_tree_code_helper(root, '')
+        root = heapq.heappop(self.__heap)  #extrait le nœud racine de l'arbre de Huffman du tas
+        self.__build_tree_code_helper(root, '') #chaîne de bits vide 
     
-    def __build_encoded_text(self, text):
+    def __build_encoded_text(self, text):#Pour chaque caractère, concatène au encoded_text le code binaire associé à ce caractère dans le dictionnaire self.__code
         encoded_text = ''
         for char in text:
             encoded_text += self.__code[char]
         return encoded_text
             
     def __build_padded_text(self, encoded_text):
-        padding_caractere = 8 - len(encoded_text) % 8
+        padding_caractere = 8 - len(encoded_text) % 8 #pour savoir commebien de bits en dois ajouter
         for i in range(padding_caractere):
             encoded_text += '0'       
         padded_info = "{0:08b}".format(padding_caractere)
@@ -74,12 +74,12 @@ class Compression:
     def compress(self):
         with open(self.path, 'r', encoding='utf-8') as file:
             text = file.read()
-            text = text.rstrip()
+            text = text.rstrip()           #supprimer les éventuels espaces ou sauts de ligne à la fin du text
             frequency_dict = self.__frequency_from_text(text)
             self.__build_heap(frequency_dict)
             self.__build_binary_tree()
             self.__build_tree_code()
-            encoded_text = self.__build_encoded_text(text)
+            encoded_text = self.__build_encoded_text(text) #Construire le texte codé
             padded_text = self.__build_padded_text(encoded_text)
         dictionnary = self.__code
         return dictionnary, padded_text

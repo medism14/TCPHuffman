@@ -12,6 +12,7 @@ def getConnection():
 
 fApi = FastAPI()
 
+
 # Permettre les requêtes depuis toutes les origines
 fApi.add_middleware(
     CORSMiddleware,
@@ -90,11 +91,12 @@ def getFiles():
 
     while True:
         type, taille = messageInfo(app)
+
         if type == "fini":
             break
         
         listFiles.append(app.recv(taille).decode())
-    
+     
     app.send("2".encode())
 
     return listFiles
