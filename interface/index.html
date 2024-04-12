@@ -136,11 +136,13 @@
                 
                 try {
                     let fileName = parentDownloadClass(item);
-    
+
                     let response = await axios.post(`http://127.0.0.1:8000/download-file?file=${fileName}`);
                     
                     let text = await response.data;
-                
+
+                    fileName = `${fileName.split('.')[0]}.txt`
+
                     let blob = new Blob([text], { type: 'text/plain'} );
                     let url = URL.createObjectURL(blob);
                     let link = document.createElement('a');

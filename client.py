@@ -113,13 +113,24 @@ def downloadFile(file: str):
 
     app.send("1".encode())
 
-    lenFile = len(file)
+    fileEncoded = file.encode()
+    lenFile = len(fileEncoded)
     app.send(f'{lenFile}|{file}'.encode())
 
-    actual_text = decompressFile(app)
+    lenContent = ""
+    while True:
+        result = app.recv(1).decode()
+
+        if result == '|':
+            break
+            
+        lenContent += result
+
+    lenContent = int(lenContent)
+    content = app.recv(lenContent).decode()
 
     app.send("3".encode())
-    return actual_text
+    return content
 
 @fApi.post("/save-file")
 def saveFile(content: Content):

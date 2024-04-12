@@ -3,6 +3,7 @@ import threading
 import os
 
 from huffman.compression import Compression
+from huffman.decompression import Decompression
 
 app = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -52,13 +53,24 @@ class ThreadLaunch(threading.Thread):
             elif action == "1":
                 ##Télécharger un fichier
                 file = self.recupLink()
-                urlDowFile = f"C:/Users/Etudiant/Desktop/Personnel/Université/M1/S2/Programmation parallèle/projet/files/{file}"
 
-                ##Compresser le fichier et l'envoyer à l'utilisateur
-                dictionnary, padded_text = Compression(urlDowFile).compress()
+                filename = file.split('.')[0]
 
-                self.conn.send(f"{dictionnary}²".encode('latin-1'))
-                self.conn.send(f"{padded_text}²".encode('latin-1'))
+                dictionnairePath = f"C:/Users/Etudiant/Desktop/Personnel/Université/M1/S2/Programmation parallèle/projet/dictionnaires/{filename}.txt"
+
+                with open(dictionnairePath, encoding='utf-8') as file:
+                    dictionnaire = file.read()
+
+                dictionnaire = eval(dictionnaire)
+
+                urlDowFile = f"C:/Users/Etudiant/Desktop/Personnel/Université/M1/S2/Programmation parallèle/projet/files/{filename}.bin"
+
+                ##Decompresser le fichier et l'envoyer à l'utilisateur
+                content = Decompression(urlDowFile, dictionnaire).decompress()
+                contentEncoded = content.encode()
+                lenContent = len(contentEncoded)
+
+                self.conn.send(f"{lenContent}|{content}".encode())
 
             elif action == "2":
                 ##Stocker un fichier
@@ -88,10 +100,7 @@ class ThreadLaunch(threading.Thread):
 
                 fileName = fileName.split('.')[0]
 
-                filePath = f"C:/Users/Etudiant/Desktop/Personnel/Université/M1/S2/Programmation parallèle/projet/files/{fileName}.txt"
-
-                with open(filePath, 'w', encoding='utf-8') as file:
-                    file.write(content)
+                Compression(content, fileName).compress()
 
 
             elif action == "3":
