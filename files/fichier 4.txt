@@ -1,2 +1,2 @@
-Tennis :
+Tennis :
 Le tennis est un sport qui oppose deux joueurs (simple) ou deux équipes de deux joueurs (double) sur un terrain rectangulaire divisé en deux moitiés par un filet. Les joueurs utilisent des raquettes pour frapper une balle en caoutchouc à travers le filet, en essayant de la faire atterrir dans le court de l'adversaire tout en évitant que l'adversaire ne renvoie la balle de manière valide. Le tennis est populaire à la fois en tant que sport amateur et professionnel, avec des tournois majeurs comme Wimbledon, l'US Open, l'Open d'Australie et Roland-Garros qui attirent une audience mondiale.

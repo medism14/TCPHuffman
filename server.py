@@ -61,6 +61,40 @@ class ThreadLaunch(threading.Thread):
                 self.conn.send(f"{padded_text}²".encode('latin-1'))
 
             elif action == "2":
+                ##Stocker un fichier
+                contentLen = fileNameLen = ""
+
+                while True:
+                    result = self.conn.recv(1).decode()
+
+                    if (result == '|'):
+                        break
+
+                    contentLen += result
+                
+                contentLength = int(contentLen)
+                content = self.conn.recv(contentLength).decode()
+
+                while True:
+                    result = self.conn.recv(1).decode()
+
+                    if (result == '|'):
+                        break
+
+                    fileNameLen += result
+                
+                fileNameLength = int(fileNameLen)
+                fileName = self.conn.recv(fileNameLength).decode()
+
+                fileName = fileName.split('.')[0]
+
+                filePath = f"C:/Users/Etudiant/Desktop/Personnel/Université/M1/S2/Programmation parallèle/projet/files/{fileName}.txt"
+
+                with open(filePath, 'w', encoding='utf-8') as file:
+                    file.write(content)
+
+
+            elif action == "3":
                 ##Déconnexion
                 self.conn.close()
                 break

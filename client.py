@@ -2,8 +2,13 @@ import socket
 import ast
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from huffman.decompression import Decompression
+
+class Content(BaseModel):
+    content: str
+    fileName: str
 
 def getConnection():
     app = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -97,7 +102,7 @@ def getFiles():
         
         listFiles.append(app.recv(taille).decode())
      
-    app.send("2".encode())
+    app.send("3".encode())
 
     return listFiles
 
@@ -113,5 +118,26 @@ def downloadFile(file: str):
 
     actual_text = decompressFile(app)
 
-    app.send("2".encode())
+    app.send("3".encode())
     return actual_text
+
+@fApi.post("/save-file")
+def saveFile(content: Content):
+
+    app = getConnection()
+
+    app.send("2".encode())
+
+    fileName = content.fileName
+    content = content.content
+
+    fileNameEncoded = fileName.encode()
+    contentEncoded = content.encode()
+
+    contentLen = len(contentEncoded)
+    fileNameLen = len(fileNameEncoded)
+
+    app.send(f'{contentLen}|{content}'.encode())
+    app.send(f'{fileNameLen}|{fileName}'.encode())
+
+    app.send("3".encode())

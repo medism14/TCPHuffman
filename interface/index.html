@@ -9,8 +9,17 @@
     <title>Gestion de fichiers</title>
 </head>
 <body class="body">
-    <div class="min-h-screen w-full bg-gray-300 flex flex-col justify-between space-y-10">
+
+    
+    <div class="min-h-screen w-full bg-gray-300 flex flex-col space-y-10">
         <p class="text-center font-bold text-3xl mt-5 underline">Projet de programmation parallèle</p>
+        <div class="p-5 w-[30%] rounded-lg flex flex-col items-center space-y-4 mx-auto bg-green-700 text-gray-200">
+            <h1 class="text-2xl font-bold">Upload</h1>
+            <form action="" class="m-0 p-0 inline" enctype="multipart/form-data">
+                <i class="fa fa-upload px-4 py-2 rounded-lg bg-gray-200 text-green-700 text-3xl cursor-pointer" class="p-4 bg-gray-200 text-green-700 text-3xl" aria-hidden="true" id="fileIcon"></i>
+                <input type="file" style="display: none;" id="file">
+            </form>
+        </div>
         <div class="flex flex-col items-center space-y-4">
             <h1 class="text-3xl font-bold">Liste des fichiers</h1>
             <table class="">
@@ -29,8 +38,62 @@
     </div>
 
     <script>
-        //Récuperer les fichiers
 
+        //Uploader le fichier
+        const fileIcon = document.getElementById('fileIcon');
+        const fichier = document.getElementById('file');
+
+        fileIcon.addEventListener('click', () => {
+            file.click();
+        });
+
+        async function enregistrerFichier(file) {
+            try {
+                const directoryHandle = await window.showDirectoryPicker();
+
+            } catch (error) {
+                console.error('Une erreur est survenue lors de l\'enregistrement du fichier ');
+            }
+        }
+
+        fichier.addEventListener('change', async (event) => {
+            const fileReader = new FileReader();
+
+            const recupFile = event.target.files[0];
+            const fileName = recupFile.name; 
+
+            const extension = fileName.split('.').pop();
+
+            if (extension !== 'txt') {
+                alert('Veuillez poster un fichier');
+                return
+            }
+
+            fileReader.onload = async function () {
+                const contenu = fileReader.result;
+
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8'
+                    }
+                };
+
+                const data = {
+                    content: contenu,
+                    fileName: fileName
+                };
+
+                const response = await axios.post(`http://127.0.0.1:8000/save-file`, data, config);
+
+                if (response.status == 200) {
+                    location.reload()
+                }
+            };
+
+            fileReader.readAsText(recupFile);
+        });
+
+        //Récuperer les fichiers
         const bodyTable = document.getElementById('bodyTable');
         const fetchFiles = async () => {
 
@@ -51,7 +114,6 @@
         fetchFiles()
 
         //Télécharger le fichier
-
         const parentDownloadClass = (element) => {
             let currentElement = element;
 
