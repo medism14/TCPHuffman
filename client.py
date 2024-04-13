@@ -4,8 +4,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from huffman.decompression import Decompression
-
 class Content(BaseModel):
     content: str
     fileName: str
@@ -17,13 +15,12 @@ def getConnection():
 
 fApi = FastAPI()
 
-
 # Permettre les requêtes depuis toutes les origines
 fApi.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -49,42 +46,6 @@ def messageInfo(app):
         taille += result
 
     return type, int(taille)
-
-
-def decompressFile(app):
-    dictionnary = padded_text = ""
-    
-    # Récupérer le bytes array
-    # while True:
-    #     resultB = app.recv(1).decode('latin-1')
-    #     if (resultB == '²'):
-    #         break
-    #     bytes_array += resultB
-
-    # Récupérer le dictionnaire
-    while True:
-        resultD = app.recv(1).decode('latin-1')
-        if (resultD == '²'):
-            break
-        dictionnary += resultD
-
-    # Récupérer le padded_text
-    while True:
-        resultP = app.recv(1).decode('latin-1')
-        if (resultP == '²'):
-            break
-        padded_text += resultP
-    
-    # Convertir dictionnary en dict
-    dictionnary = ast.literal_eval(dictionnary)
-
-    # Convertir Content en bytes
-    # bytes_array = bytes_array.lstrip("b").strip("'\"")
-    # bytes_array = bytes_array.encode("utf-8")
-    
-    actual_text = Decompression(dictionnary).decompress(padded_text)
-
-    return actual_text
 
 
 @fApi.get("/recup-files")
@@ -150,5 +111,18 @@ def saveFile(content: Content):
 
     app.send(f'{contentLen}|{content}'.encode())
     app.send(f'{fileNameLen}|{fileName}'.encode())
+
+    app.send("3".encode())
+
+@fApi.delete("/remove-file")
+def RemoveFile(file: str):
+
+    app = getConnection()
+
+    app.send("4".encode())
+
+    lenFile = len(file.encode())
+
+    app.send(f"{lenFile}|{file}".encode())
 
     app.send("3".encode())

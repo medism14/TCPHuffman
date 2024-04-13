@@ -105,7 +105,10 @@
                 bodyTable.innerHTML += `
                     <tr class="border-b-2">
                         <td class="border-2 border-[#ffffff] h-12 px-14 py-4"><span>${file}</span></td>
-                        <td class="border-2 border-[#ffffff] h-12 px-14 py-4"><button class="text-2xl px-2 py-1 border-2 rounded-lg text-yellow-700 border-yellow-200 download"><i class="fa-solid fa-download"></i></button></td>
+                        <td class="border-2 border-[#ffffff] h-12 px-14 py-4 space-x-5">
+                            <button class="text-2xl px-2 py-1 border-2 rounded-lg text-blue-700 border-blue-700 download transition-all duration-300 hover:bg-blue-700 hover:text-gray-100"><i class="fa-solid fa-download"></i></button>
+                            <button class="text-2xl px-2 py-1 border-2 rounded-lg text-red-700 border-red-700 trash transition-all duration-300 hover:bg-red-700 hover:text-gray-100"><i class="fa-solid fa-trash"></i></button>
+                        </td>
                     </tr>
                 `;
             });
@@ -119,8 +122,19 @@
 
             while (currentElement) {
                 if (currentElement.classList.contains('download')) {
-                    return currentElement.parentNode.parentNode.querySelector('span').textContent
+                    return {
+                        filename: currentElement.parentNode.parentNode.querySelector('span').textContent,
+                        type: "téléchargement"
+                    }
                 }
+
+                if (currentElement.classList.contains('trash')) {
+                    return {
+                        filename: currentElement.parentNode.parentNode.querySelector('span').textContent,
+                        type: "suppression"
+                    }
+                }
+
                 currentElement = currentElement.parentNode;
 
                 if (currentElement.classList.contains('body')) {
@@ -133,32 +147,49 @@
         bodyTable.addEventListener('click', async (event) => {
             let item = event.target;
             if (parentDownloadClass(item)) { 
-                
+                let { filename , type } = parentDownloadClass(item);
                 try {
-                    let fileName = parentDownloadClass(item);
 
-                    let response = await axios.post(`http://127.0.0.1:8000/download-file?file=${fileName}`);
+                    if (type == "téléchargement") {
+                        let response = await axios.post(`http://127.0.0.1:8000/download-file?file=${filename}`);
+                        
+                        let text = await response.data;
+    
+                        filename = `${filename.split('.')[0]}.txt`
+    
+                        let blob = new Blob([text], { type: 'text/plain'} );
+                        let url = URL.createObjectURL(blob);
+                        let link = document.createElement('a');
                     
-                    let text = await response.data;
+                        link.href = url;
+                        link.download = filename;
+                    
+                        link.click();
+                    
+                        URL.revokeObjectURL(url)
+                    } else if (type == "suppression") {
 
-                    fileName = `${fileName.split('.')[0]}.txt`
+                        confirmation = confirm("Vous êtes sûr de vouloir supprimer ce fichier ?")
 
-                    let blob = new Blob([text], { type: 'text/plain'} );
-                    let url = URL.createObjectURL(blob);
-                    let link = document.createElement('a');
-                
-                    link.href = url;
-                    link.download = fileName;
-                
-                    link.click();
-                
-                    URL.revokeObjectURL(url)
-                } catch (error) {
-                    alert("Erreur lors du téléchargemnet du fichier")
+                        if (confirmation) {
+                            let response = await axios.delete(`http://127.0.0.1:8000/remove-file?file=${filename}`);
+    
+                            if (response.status == 200) {
+                                location.reload()
+                            }
+                        }
+                    }
+
+                } catch (error) { 
+                    alert(`Erreur lors ${type == "suppression" ? 'de la suppression' : 'du téléchargement'} du fichier`)
                 }
                 
             }
         });
+    
+        //Suprimer un fichier
+
+        
     </script>
 </body>
 </html>

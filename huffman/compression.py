@@ -1,5 +1,4 @@
 import heapq # pour manipuler le tas
-import os
 import json
 
 

@@ -12,7 +12,7 @@ app.bind(("127.0.0.1", 1400))
 app.listen()
 
 class ThreadLaunch(threading.Thread): 
-    def __init__(self, info):
+    def __init__(self, conn):
         super().__init__()
         self.conn = conn
 
@@ -38,7 +38,7 @@ class ThreadLaunch(threading.Thread):
     
     def run(self):
         while True:
-            action = self.conn.recv(1).decode()
+            action = self.conn.recv(1).decode() 
 
             if action == "0":
                 ##Recuperer les fichiers
@@ -101,7 +101,33 @@ class ThreadLaunch(threading.Thread):
                 fileName = fileName.split('.')[0]
 
                 Compression(content, fileName).compress()
+            
+            elif action == "4":
+                lenFile = ""
 
+                while True:
+                    result = self.conn.recv(1).decode()
+
+                    if (result == "|"):
+                        break
+
+                    lenFile += result
+                
+                lenFile = int(lenFile)
+
+                filename = self.conn.recv(lenFile).decode()
+
+                filenameWithoutExtension = filename.split('.')[0]
+
+                urlFileCompressed = f"C:/Users/Etudiant/Desktop/Personnel/Université/M1/S2/Programmation parallèle/projet/files/{filenameWithoutExtension}.bin"
+
+                urlFileDictionnaire = f"C:/Users/Etudiant/Desktop/Personnel/Université/M1/S2/Programmation parallèle/projet/dictionnaires/{filenameWithoutExtension}.txt"
+
+                if os.path.exists(urlFileCompressed):
+                    os.remove(urlFileCompressed)
+
+                if os.path.exists(urlFileDictionnaire):
+                    os.remove(urlFileDictionnaire)
 
             elif action == "3":
                 ##Déconnexion
